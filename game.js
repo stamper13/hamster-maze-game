@@ -180,19 +180,12 @@ function updateScore() {
 }
 
 function update() {
-    moveHam### Step-by-Step Implementation (Continued)
-
-Let's complete the `update` function and add swipe detection for mobile controls.
-
-### Updated `game.js` (continued)
-
-```javascript
-function update() {
     moveHamster();
     drawMaze();
     drawGoal();
     drawHamster();
     updateScore();
+    requestAnimationFrame(update);
 }
 
 // Swipe detection for mobile devices
@@ -239,7 +232,6 @@ document.addEventListener('keydown', event => {
 });
 
 function startGame() {
-    backgroundMusic.play();
     createMaze();
-    setInterval(update, speed);
+    requestAnimationFrame(update);
 }
