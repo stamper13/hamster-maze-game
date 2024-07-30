@@ -179,13 +179,18 @@ function updateScore() {
     scoreElement.textContent = `Score: ${score}`;
 }
 
-function update() {
-    moveHamster();
+let lastMoveTime = 0;
+
+function gameLoop(timestamp) {
+    if (timestamp - lastMoveTime >= speed) {
+        moveHamster();
+        lastMoveTime = timestamp;
+    }
     drawMaze();
     drawGoal();
     drawHamster();
     updateScore();
-    requestAnimationFrame(update);
+    requestAnimationFrame(gameLoop);
 }
 
 // Swipe detection for mobile devices
@@ -233,5 +238,5 @@ document.addEventListener('keydown', event => {
 
 function startGame() {
     createMaze();
-    requestAnimationFrame(update);
+    requestAnimationFrame(gameLoop);
 }
