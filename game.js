@@ -24,9 +24,11 @@ const hamsterImage = new Image();
 hamsterImage.src = 'hamster.png';
 const wallImage = new Image();
 wallImage.src = 'walls.png';
+const goalImage = new Image();
+goalImage.src = 'cheese.png';
 
 let imagesLoaded = 0;
-const totalImages = 2;
+const totalImages = 3;
 
 function imageLoaded() {
     imagesLoaded++;
@@ -37,6 +39,7 @@ function imageLoaded() {
 
 hamsterImage.onload = imageLoaded;
 wallImage.onload = imageLoaded;
+goalImage.onload = imageLoaded;
 
 startButton.addEventListener('click', () => {
     backgroundMusic.play();
@@ -134,8 +137,7 @@ function drawHamster() {
 }
 
 function drawGoal() {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(goal.x, goal.y, tileSize, tileSize);
+    ctx.drawImage(goalImage, goal.x, goal.y, tileSize, tileSize);
 }
 
 function moveHamster() {
@@ -154,7 +156,7 @@ function moveHamster() {
 
     if (maze[hamsterRow][hamsterCol] === 1) {
         squeakSound.play();
-        alert('Game Over! You hit a wall.');
+        alert(`Game Over! You hit a wall. Your score: ${score}`);
         hamster = { x: 0, y: 0, direction: 'right' };
         level = 1;
         speed = 500;
@@ -178,11 +180,55 @@ function updateScore() {
 }
 
 function update() {
+    moveHam### Step-by-Step Implementation (Continued)
+
+Let's complete the `update` function and add swipe detection for mobile controls.
+
+### Updated `game.js` (continued)
+
+```javascript
+function update() {
     moveHamster();
     drawMaze();
     drawGoal();
     drawHamster();
     updateScore();
+}
+
+// Swipe detection for mobile devices
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+canvas.addEventListener('touchstart', function(event) {
+    touchStartX = event.changedTouches[0].screenX;
+    touchStartY = event.changedTouches[0].screenY;
+}, false);
+
+canvas.addEventListener('touchend', function(event) {
+    touchEndX = event.changedTouches[0].screenX;
+    touchEndY = event.changedTouches[0].screenY;
+    handleSwipe();
+}, false);
+
+function handleSwipe() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0) {
+            hamster.direction = 'right';
+        } else {
+            hamster.direction = 'left';
+        }
+    } else {
+        if (deltaY > 0) {
+            hamster.direction = 'down';
+        } else {
+            hamster.direction = 'up';
+        }
+    }
 }
 
 document.addEventListener('keydown', event => {
@@ -193,6 +239,7 @@ document.addEventListener('keydown', event => {
 });
 
 function startGame() {
+    backgroundMusic.play();
     createMaze();
     setInterval(update, speed);
 }
