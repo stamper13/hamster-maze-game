@@ -2,8 +2,8 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const tileSize = 40; // Tile size
-const rows = Math.floor(window.innerHeight * 0.8 / tileSize);
-const cols = Math.floor(window.innerWidth * 0.8 / tileSize);
+const rows = 10; // Fixed number of rows
+const cols = 10; // Fixed number of columns
 
 canvas.width = cols * tileSize;
 canvas.height = rows * tileSize;
@@ -18,7 +18,8 @@ let score = 0;
 const scoreElement = document.getElementById('score');
 const squeakSound = new Audio('squeak.mp3');
 const backgroundMusic = document.getElementById('backgroundMusic');
-backgroundMusic.volume = 0.2;  // Adjust the volume (0.0 to 1.0)
+backgroundMusic.volume = 0.5; // Adjust volume
+
 const startButton = document.getElementById('startButton');
 
 const hamsterImage = new Image();
@@ -142,22 +143,26 @@ function drawGoal() {
 }
 
 function moveHamster() {
+    const previousX = hamster.x;
+    const previousY = hamster.y;
+
     if (hamster.direction === 'right') hamster.x += tileSize;
     else if (hamster.direction === 'left') hamster.x -= tileSize;
     else if (hamster.direction === 'up') hamster.y -= tileSize;
     else if (hamster.direction === 'down') hamster.y += tileSize;
 
-    if (hamster.x >= canvas.width) hamster.x = 0;
-    else if (hamster.x < 0) hamster.x = canvas.width - tileSize;
-    if (hamster.y >= canvas.height) hamster.y = 0;
-    else if (hamster.y < 0) hamster.y = canvas.height - tileSize;
+    // Check if hamster hits the border
+    if (hamster.x >= canvas.width || hamster.x < 0 || hamster.y >= canvas.height || hamster.y < 0) {
+        hamster.x = previousX;
+        hamster.y = previousY;
+    }
 
     const hamsterRow = Math.floor(hamster.y / tileSize);
     const hamsterCol = Math.floor(hamster.x / tileSize);
 
     if (maze[hamsterRow][hamsterCol] === 1) {
         squeakSound.play();
-        backgroundMusic.pause();  // Stop the background music
+        backgroundMusic.pause();
         alert(`Game Over! You hit a wall. Your score: ${score}`);
         hamster = { x: 0, y: 0, direction: 'right' };
         level = 1;
@@ -165,6 +170,7 @@ function moveHamster() {
         score = 0; // Reset score
         updateScore();
         createMaze();
+        backgroundMusic.currentTime = 0; // Reset music
     }
 
     if (hamster.x === goal.x && hamster.y === goal.y) {
@@ -190,14 +196,6 @@ function update() {
 }
 
 // Swipe detection for mobile devices
-let touchStartX = 0;
-let touchStartY = 0;
-let touchEndX = 0;
-let touchEndY = 0;
-
-canvas.addEventListener('touchstart', function(event) {
-    touchStartX = event.changedTouches[0].screenX;
-    touchStart```javascript
 let touchStartX = 0;
 let touchStartY = 0;
 let touchEndX = 0;
@@ -245,3 +243,13 @@ function startGame() {
     createMaze();
     setInterval(update, speed);
 }
+
+// Resize canvas based on screen size while maintaining maze size
+window.addEventListener('resize', () => {
+    const scale = Math.min(window.innerWidth / (cols * tileSize), window.innerHeight / (rows * tileSize));
+    canvas.style.transform = `scale(${scale})`;
+    canvas.style.transformOrigin = 'top left';
+});
+
+// Initial scaling
+window.dispatchEvent(new Event('resize'));
