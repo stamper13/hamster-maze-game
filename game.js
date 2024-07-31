@@ -18,6 +18,7 @@ let score = 0;
 const scoreElement = document.getElementById('score');
 const squeakSound = new Audio('squeak.mp3');
 const backgroundMusic = document.getElementById('backgroundMusic');
+backgroundMusic.volume = 0.2;  // Adjust the volume (0.0 to 1.0)
 const startButton = document.getElementById('startButton');
 
 const hamsterImage = new Image();
@@ -156,6 +157,7 @@ function moveHamster() {
 
     if (maze[hamsterRow][hamsterCol] === 1) {
         squeakSound.play();
+        backgroundMusic.pause();  // Stop the background music
         alert(`Game Over! You hit a wall. Your score: ${score}`);
         hamster = { x: 0, y: 0, direction: 'right' };
         level = 1;
@@ -179,21 +181,23 @@ function updateScore() {
     scoreElement.textContent = `Score: ${score}`;
 }
 
-let lastMoveTime = 0;
-
-function gameLoop(timestamp) {
-    if (timestamp - lastMoveTime >= speed) {
-        moveHamster();
-        lastMoveTime = timestamp;
-    }
+function update() {
+    moveHamster();
     drawMaze();
     drawGoal();
     drawHamster();
     updateScore();
-    requestAnimationFrame(gameLoop);
 }
 
 // Swipe detection for mobile devices
+let touchStartX = 0;
+let touchStartY = 0;
+let touchEndX = 0;
+let touchEndY = 0;
+
+canvas.addEventListener('touchstart', function(event) {
+    touchStartX = event.changedTouches[0].screenX;
+    touchStart```javascript
 let touchStartX = 0;
 let touchStartY = 0;
 let touchEndX = 0;
@@ -237,6 +241,7 @@ document.addEventListener('keydown', event => {
 });
 
 function startGame() {
+    backgroundMusic.play();
     createMaze();
-    requestAnimationFrame(gameLoop);
+    setInterval(update, speed);
 }
