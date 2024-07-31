@@ -2,11 +2,8 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 const tileSize = 40; // Tile size
-const rows = 10; // Fixed number of rows
-const cols = 10; // Fixed number of columns
-
-canvas.width = cols * tileSize;
-canvas.height = rows * tileSize;
+let rows = 10; // Fixed number of rows
+let cols = 10; // Fixed number of columns
 
 let hamster = { x: 0, y: 0, direction: 'right' };
 let maze = [];
@@ -245,11 +242,14 @@ function startGame() {
 }
 
 // Resize canvas based on screen size while maintaining maze size
-window.addEventListener('resize', () => {
+function resizeCanvas() {
     const scale = Math.min(window.innerWidth / (cols * tileSize), window.innerHeight / (rows * tileSize));
+    canvas.width = cols * tileSize * scale;
+    canvas.height = rows * tileSize * scale;
     canvas.style.transform = `scale(${scale})`;
     canvas.style.transformOrigin = 'top left';
-});
+}
 
 // Initial scaling
-window.dispatchEvent(new Event('resize'));
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
