@@ -244,8 +244,8 @@ function startGame() {
 // Resize canvas based on screen size while maintaining maze size
 function resizeCanvas() {
     const scale = Math.min(window.innerWidth / (cols * tileSize), window.innerHeight / (rows * tileSize));
-    canvas.width = cols * tileSize * scale;
-    canvas.height = rows * tileSize * scale;
+    canvas.style.width = `${cols * tileSize * scale}px`;
+    canvas.style.height = `${rows * tileSize * scale}px`;
     canvas.style.transform = `scale(${scale})`;
     canvas.style.transformOrigin = 'top left';
 }
