@@ -1,15 +1,15 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const tileSize = 40; // Tile size
-let rows = 10; // Fixed number of rows
-let cols = 10; // Fixed number of columns
+const rows = 10; // Fixed number of rows
+const cols = 10; // Fixed number of columns
+let tileSize; // Tile size to be calculated based on screen size
 
 let hamster = { x: 0, y: 0, direction: 'right' };
 let maze = [];
 let level = 1;
 let speed = 500;  // Initial speed in milliseconds
-let goal = { x: (cols - 1) * tileSize, y: (rows - 1) * tileSize };
+let goal = { x: cols - 1, y: rows - 1 };
 
 let score = 0;
 const scoreElement = document.getElementById('score');
@@ -111,8 +111,8 @@ function drawMaze() {
 }
 
 function drawHamster() {
-    const centerX = hamster.x + tileSize / 2;
-    const centerY = hamster.y + tileSize / 2;
+    const centerX = hamster.x * tileSize + tileSize / 2;
+    const centerY = hamster.y * tileSize + tileSize / 2;
     ctx.save();
     ctx.translate(centerX, centerY);
 
@@ -136,28 +136,25 @@ function drawHamster() {
 }
 
 function drawGoal() {
-    ctx.drawImage(goalImage, goal.x, goal.y, tileSize, tileSize);
+    ctx.drawImage(goalImage, goal.x * tileSize, goal.y * tileSize, tileSize, tileSize);
 }
 
 function moveHamster() {
     const previousX = hamster.x;
     const previousY = hamster.y;
 
-    if (hamster.direction === 'right') hamster.x += tileSize;
-    else if (hamster.direction === 'left') hamster.x -= tileSize;
-    else if (hamster.direction === 'up') hamster.y -= tileSize;
-    else if (hamster.direction === 'down') hamster.y += tileSize;
+    if (hamster.direction === 'right') hamster.x++;
+    else if (hamster.direction === 'left') hamster.x--;
+    else if (hamster.direction === 'up') hamster.y--;
+    else if (hamster.direction === 'down') hamster.y++;
 
     // Check if hamster hits the border
-    if (hamster.x >= canvas.width || hamster.x < 0 || hamster.y >= canvas.height || hamster.y < 0) {
+    if (hamster.x >= cols || hamster.x < 0 || hamster.y >= rows || hamster.y < 0) {
         hamster.x = previousX;
         hamster.y = previousY;
     }
 
-    const hamsterRow = Math.floor(hamster.y / tileSize);
-    const hamsterCol = Math.floor(hamster.x / tileSize);
-
-    if (maze[hamsterRow][hamsterCol] === 1) {
+    if (maze[hamster.y][hamster.x] === 1) {
         squeakSound.play();
         backgroundMusic.pause();
         alert(`Game Over! You hit a wall. Your score: ${score}`);
@@ -243,11 +240,10 @@ function startGame() {
 
 // Resize canvas based on screen size while maintaining maze size
 function resizeCanvas() {
-    const scale = Math.min(window.innerWidth / (cols * tileSize), window.innerHeight / (rows * tileSize));
-    canvas.style.width = `${cols * tileSize * scale}px`;
-    canvas.style.height = `${rows * tileSize * scale}px`;
-    canvas.style.transform = `scale(${scale})`;
-    canvas.style.transformOrigin = 'top left';
+    const minDimension = Math.min(window.innerWidth, window.innerHeight);
+    tileSize = Math.floor(minDimension / Math.max(rows, cols));
+    canvas.width = cols * tileSize;
+    canvas.height = rows * tileSize;
 }
 
 // Initial scaling
